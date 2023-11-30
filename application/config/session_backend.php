@@ -1,0 +1,11 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+$config['my_session']['sess_cookie_name']		= 'monitoring_backend';
+$config['my_session']['sess_expiration']		= 7200;
+$config['my_session']['sess_expire_on_close']	= TRUE;
+$config['my_session']['sess_encrypt_cookie']	= FALSE;
+$config['my_session']['sess_use_database']		= TRUE;
+$config['my_session']['sess_table_name']		= 'sessions_backend';
+$config['my_session']['sess_match_ip']			= FALSE;
+$config['my_session']['sess_match_useragent']	= TRUE;
+$config['my_session']['sess_time_to_update']	= 300;
+$config['my_session']['encryption_key'] 		= 'isengaj';
