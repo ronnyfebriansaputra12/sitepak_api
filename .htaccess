@@ -1,12 +1,18 @@
-#Options +FollowSymLinks
-IndexIgnore */*
+Options +FollowSymLinks
+IndexIgnore _/_
 <IfModule mod_rewrite.c>
 RewriteEngine on
 
-# if a directory or a file exists, use it directly
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+    # if a directory or a file exists, use it directly
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
 
-# otherwise forward it to index.php
-RewriteRule . index.php
+    # otherwise forward it to index.php
+    RewriteRule . index.php
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Headers "Authorization"
 </IfModule>
