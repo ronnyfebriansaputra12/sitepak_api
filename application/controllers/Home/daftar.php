@@ -9,7 +9,7 @@ class daftar extends CI_Controller
 		$this->load->helper('captcha');
 
 		$config = [
-			'img_path' => './captcha',
+			'img_path' => './application/assets/captcha/',
 			'img_url' => base_url('captcha'),
 			'img_width' => 250,
 			'img_height' => 40,
@@ -35,10 +35,9 @@ class daftar extends CI_Controller
 				->set_output(json_encode($json_response));
 		} else {
 			// Handle the case when create_captcha fails
-			$error_message = $this->image_lib->display_errors('', '');
 			$this->output
 				->set_content_type('application/json')
-				->set_output(json_encode(['error' => 'Captcha generation failed. ' . $error_message]));
+				->set_output(json_encode(['error' => 'Captcha generation failed. ']));
 		}
 	}
 
@@ -50,9 +49,7 @@ class daftar extends CI_Controller
 		$hasil = [];
 
 		$userCaptcha = $data_post["CAPTCHA"];
-
 		$captchaWord = $this->session->userdata('captcha_word');
-		// print_r($captchaWord);die;
 
 		if ($userCaptcha !== $captchaWord) {
 			$hasil = [
@@ -61,7 +58,7 @@ class daftar extends CI_Controller
 				'data' => null
 			];
 		} else {
-				unset($data_post['CAPTCHA']);
+			unset($data_post['CAPTCHA']);
 
 			if ($data_post["NIK"] == "" || $data_post["NO_KK"] == "" || $data_post["NAMA"] == "" || $data_post["ALAMAT"] == "" || $data_post["KEC"] == "" || $data_post["KEL"] == "" || $data_post["NO_HP"] == "" || $data_post["EMAIL"] == "" || $data_post["PASSWORD"] == "") {
 				$hasil = [
@@ -101,6 +98,7 @@ class daftar extends CI_Controller
 							$data_post['EXP_AKTIVASI'] = $exp;
 							$data_post['PASSWORD'] = md5($data_post["PASSWORD"]);
 							$data_post['STATUS'] = 0;
+
 							$record = new User_sitepak_model($data_post);
 							$affected_rows = $record->save();
 
@@ -111,6 +109,16 @@ class daftar extends CI_Controller
 									'data' => null
 								];
 							} else {
+								$imagePath = './application/assets/captcha';
+
+								if (file_exists($imagePath)) {
+									// Assuming you want to delete all files in the ./captcha directory
+									$files = glob($imagePath . '/*');
+									foreach ($files as $file) {
+										unlink($file); // Delete each file
+									}
+								}
+
 								$hasil = [
 									'status' => true,
 									'message' => 'Success input data',
@@ -128,7 +136,6 @@ class daftar extends CI_Controller
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 	}
-
 
 	function aktivasiUser()
 	{

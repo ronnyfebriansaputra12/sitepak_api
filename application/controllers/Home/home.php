@@ -10,13 +10,25 @@ class home extends CI_Controller
 		$input_data = file_get_contents('php://input');
 		$data_post = json_decode($input_data, true);
 		$hasil = [];
-	
+
+
+		$captcha_word_session = $this->session->userdata('captcha_word');
+		if (empty($captcha_word_session) || $data_post['captcha'] !== $captcha_word_session) {
+			$hasil = [
+				'status' => false,
+				'message' => 'Captcha tidak valid',
+				'data' => null
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+			return;
+		}
+
 		$user = User_sitepak_model::get_criteria(array(
 			"select" => "nik, nama, no_kk, kec, kel, no_hp, email, status",
 			"where" => array("nik" => $data_post["nik"], "PASSWORD" => md5($data_post["password"]))
 		));
 		$numRecords = count($user);
-	
+
 		if ($numRecords == 0) {
 			$hasil = [
 				'status' => false,
@@ -40,7 +52,7 @@ class home extends CI_Controller
 					// tambahkan informasi lain yang diperlukan
 				];
 				$jwt_token = JWT::encode($token_data, $jwt_secret, 'HS256');
-	
+
 				// Display user data
 				$user_data = [
 					'nik' => $user[0]->nik,
@@ -52,8 +64,16 @@ class home extends CI_Controller
 					'email' => $user[0]->email,
 					'status' => $user[0]->status,
 				];
-	
-				// Include token and user data in the response
+
+				$imagePath = './application/assets/captcha';
+
+				if (file_exists($imagePath)) {
+					$files = glob($imagePath . '/*');
+					foreach ($files as $file) {
+						unlink($file);
+					}
+				}
+
 				$hasil = [
 					'status' => true,
 					'message' => 'Login berhasil',
@@ -64,8 +84,7 @@ class home extends CI_Controller
 				];
 			}
 		}
-	
+
 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 	}
-	
 }
