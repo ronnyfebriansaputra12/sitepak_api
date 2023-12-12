@@ -70,17 +70,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | The $query_builder variables lets you determine whether or not to load
 | the query builder class.
 */
-$active_group = 'default';
+$active_group = 'oci';
 $query_builder = TRUE;
 
-$db['default'] = array(
+$db['oci'] = array(
 	'dsn'	=> '',
 	//'hostname' => '192.168.0.139',
-	'hostname' => '127.0.0.1',
-	'username' => 'root',
-	'password' => '',
-	'database' => 'sitepak_api',
-	'dbdriver' => 'mysql',
+	'hostname' => 'localhost',
+	'username' => 'sitepakdb',
+	'password' => 'sitepakdb123',
+	'database' => 'XE',
+	'dbdriver' => 'oci8',
 	'dbprefix' => '',
 	'pconnect' => TRUE,
 	'db_debug' => (ENVIRONMENT !== 'production'),
@@ -96,4 +96,3 @@ $db['default'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
-

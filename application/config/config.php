@@ -388,10 +388,18 @@ $config['encryption_key'] = 'tanyasamsul';
 | except for 'cookie_prefix' and 'cookie_httponly', which are ignored here.
 |
 */
+// $config['sess_driver'] = 'files';
+// $config['sess_cookie_name'] = 'sitepak';
+// $config['sess_expiration'] = 1800;
+// $config['sess_save_path'] = APPPATH . 'session';
+// $config['sess_match_ip'] = FALSE;
+// $config['sess_time_to_update'] = 75;
+// $config['sess_regenerate_destroy'] = FALSE;
+
 $config['sess_driver'] = 'files';
 $config['sess_cookie_name'] = 'sitepak';
 $config['sess_expiration'] = 1800;
-$config['sess_save_path'] = APPPATH . 'session';
+$config['sess_save_path'] = null;
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 75;
 $config['sess_regenerate_destroy'] = FALSE;

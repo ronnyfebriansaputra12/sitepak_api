@@ -13,7 +13,7 @@ class home extends CI_Controller
 	
 		$user = User_sitepak_model::get_criteria(array(
 			"select" => "nik, nama, no_kk, kec, kel, no_hp, email, status",
-			"where" => array("NIK" => $data_post["nik"], "password" => md5($data_post["password"]))
+			"where" => array("nik" => $data_post["nik"], "PASSWORD" => md5($data_post["password"]))
 		));
 		$numRecords = count($user);
 	

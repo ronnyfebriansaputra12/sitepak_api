@@ -3,73 +3,132 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class daftar extends CI_Controller
 {
+
+	public function captcha()
+	{
+		$this->load->helper('captcha');
+
+		$config = [
+			'img_path' => './captcha',
+			'img_url' => base_url('captcha'),
+			'img_width' => 250,
+			'img_height' => 40,
+			'border' => 1,
+			'expiration' => 3600,
+			'font_path' => './path/to/your/font.ttf',
+		];
+
+		// Create captcha
+		$captcha = create_captcha($config);
+
+		if ($captcha !== false) {
+			// Set captcha word in session
+			$this->session->set_userdata('captcha_word', $captcha['word']);
+
+			$json_response = [
+				'word' => $captcha['word'],
+				'image' => $captcha['image'],
+			];
+
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($json_response));
+		} else {
+			// Handle the case when create_captcha fails
+			$error_message = $this->image_lib->display_errors('', '');
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode(['error' => 'Captcha generation failed. ' . $error_message]));
+		}
+	}
+
+
 	function registrasi()
 	{
 		$input_data = file_get_contents('php://input');
 		$data_post = json_decode($input_data, true);
 		$hasil = [];
 
-		if ($data_post["nik"] == "" || $data_post["no_kk"] == "" || $data_post["nama"] == "" || $data_post["alamat"] == "" || $data_post["kec"] == "" || $data_post["kel"] == "" || $data_post["no_hp"] == "" || $data_post["email"] == "" || $data_post["password"] == "") {
+		$userCaptcha = $data_post["CAPTCHA"];
+
+		$captchaWord = $this->session->userdata('captcha_word');
+		// print_r($captchaWord);die;
+
+		if ($userCaptcha !== $captchaWord) {
 			$hasil = [
 				'status' => false,
-				'message' => 'Tidak Boleh Ada Yang Kosong',
+				'message' => 'Captcha validation failed',
 				'data' => null
 			];
 		} else {
-			$numRecords = count(User_sitepak_model::get_criteria(array("nik" => $data_post["nik"])));
-			if ($numRecords > 0) {
+				unset($data_post['CAPTCHA']);
+
+			if ($data_post["NIK"] == "" || $data_post["NO_KK"] == "" || $data_post["NAMA"] == "" || $data_post["ALAMAT"] == "" || $data_post["KEC"] == "" || $data_post["KEL"] == "" || $data_post["NO_HP"] == "" || $data_post["EMAIL"] == "" || $data_post["PASSWORD"] == "") {
 				$hasil = [
 					'status' => false,
-					'message' => 'NIK sudah terdaftar',
+					'message' => 'Tidak Boleh Ada Yang Kosong',
 					'data' => null
 				];
 			} else {
-				$numRecordsEmail = count(User_sitepak_model::get_criteria(array("email" => $data_post["email"])));
-				if ($numRecordsEmail > 0) {
+				$numRecords = count(User_sitepak_model::get_criteria(array("NIK" => $data_post["NIK"])));
+				if ($numRecords > 0) {
 					$hasil = [
 						'status' => false,
-						'message' => 'Email sudah terdaftar',
+						'message' => 'NIK sudah terdaftar',
 						'data' => null
 					];
 				} else {
-					$numRecordsHp = count(User_sitepak_model::get_criteria(array("no_hp" => $data_post["no_hp"])));
-					if ($numRecordsHp > 0) {
+					$numRecordsEmail = count(User_sitepak_model::get_criteria(array("EMAIl" => $data_post["EMAIL"])));
+					if ($numRecordsEmail > 0) {
 						$hasil = [
 							'status' => false,
-							'message' => 'Nomor HP sudah terdaftar',
+							'message' => 'Email sudah terdaftar',
 							'data' => null
 						];
 					} else {
-						$timestamp = time() - 86400;
-						$date = strtotime("+7 day", $timestamp);
-						$exp = date('d-m-Y', $date);
-
-						$data_post['exp_aktivasi'] = $exp;
-						$data_post['password'] = md5($data_post["password"]);
-						$data_post['status'] = 0;
-						$record = new User_sitepak_model($data_post);
-						$affected_rows = $record->save();
-
-						if (!$affected_rows) {
+						$numRecordsHp = count(User_sitepak_model::get_criteria(array("NO_HP" => $data_post["NO_HP"])));
+						if ($numRecordsHp > 0) {
 							$hasil = [
 								'status' => false,
-								'message' => 'Gagal menyimpan data',
+								'message' => 'Nomor HP sudah terdaftar',
 								'data' => null
 							];
 						} else {
-							$hasil = [
-								'status' => true,
-								'message' => 'Success input data',
-								'data' => $data_post
-							];
+							$timestamp = time() - 86400;
+							$date = strtotime("+7 day", $timestamp);
+							$exp = date('d-m-Y', $date);
+
+							$data_post['EXP_AKTIVASI'] = $exp;
+							$data_post['PASSWORD'] = md5($data_post["PASSWORD"]);
+							$data_post['STATUS'] = 0;
+							$record = new User_sitepak_model($data_post);
+							$affected_rows = $record->save();
+
+							if (!$affected_rows) {
+								$hasil = [
+									'status' => false,
+									'message' => 'Gagal menyimpan data',
+									'data' => null
+								];
+							} else {
+								$hasil = [
+									'status' => true,
+									'message' => 'Success input data',
+									'data' => $data_post
+								];
+							}
 						}
 					}
 				}
 			}
 		}
 
+		// Clear the captcha word from the session
+		$this->session->unset_userdata('captcha_word');
+
 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 	}
+
 
 	function aktivasiUser()
 	{

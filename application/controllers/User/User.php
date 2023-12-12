@@ -7,6 +7,27 @@ use Firebase\JWT\Key;
 class User extends CI_Controller
 {
 
+    function listUser()
+    {
+        $users = $this->db->get('USER_SITEPAK')->result_array();
+
+        if (!empty($users)) {
+            $hasil = [
+                'status' => true,
+                'message' => 'Data Found',
+                'data' => $users
+            ];
+        } else {
+            $hasil = [
+                'status' => false,
+                'message' => 'Data not Found',
+                'data' => null
+            ];
+        }
+
+        $this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+    }
+
     public function listUserRegistration()
     {
         $headers = apache_request_headers();
