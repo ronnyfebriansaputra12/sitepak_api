@@ -65,8 +65,8 @@ class home extends CI_Controller
 					'status' => $user[0]->status,
 				];
 
-				$imagePath = './application/assets/captcha';
-
+				// Remove existing captcha images
+				$imagePath = './assets/captcha';
 				if (file_exists($imagePath)) {
 					$files = glob($imagePath . '/*');
 					foreach ($files as $file) {

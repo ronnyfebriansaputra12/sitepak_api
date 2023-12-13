@@ -9,8 +9,8 @@ class daftar extends CI_Controller
 		$this->load->helper('captcha');
 
 		$config = [
-			'img_path' => './application/assets/captcha/',
-			'img_url' => base_url('captcha'),
+			'img_path' => './assets/captcha/',
+			'img_url' => base_url('/assets/captcha/'),
 			'img_width' => 250,
 			'img_height' => 40,
 			'border' => 1,
@@ -40,12 +40,9 @@ class daftar extends CI_Controller
 				->set_output(json_encode(['error' => 'Captcha generation failed. ']));
 		}
 	}
-
-
 	function registrasi()
 	{
-		$input_data = file_get_contents('php://input');
-		$data_post = json_decode($input_data, true);
+		$data_post = $_POST;
 		$hasil = [];
 
 		$userCaptcha = $data_post["CAPTCHA"];
@@ -75,7 +72,7 @@ class daftar extends CI_Controller
 						'data' => null
 					];
 				} else {
-					$numRecordsEmail = count(User_sitepak_model::get_criteria(array("EMAIl" => $data_post["EMAIL"])));
+					$numRecordsEmail = count(User_sitepak_model::get_criteria(array("EMAIL" => $data_post["EMAIL"])));
 					if ($numRecordsEmail > 0) {
 						$hasil = [
 							'status' => false,
@@ -91,6 +88,25 @@ class daftar extends CI_Controller
 								'data' => null
 							];
 						} else {
+							if (isset($_FILES['FOTO'])) {
+								$upload_dir = './assets/images/';
+								$temp_name = $_FILES['FOTO']['tmp_name'];
+								$new_name = $upload_dir . $data_post['NIK'] . '_foto-profile.jpg';
+
+								if (move_uploaded_file($temp_name, $new_name)) {
+									$data_post['FOTO'] = $new_name;
+								} else {
+									$hasil = [
+										'status' => false,
+										'message' => 'Failed to upload profile image',
+										'data' => null
+									];
+
+									$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+									return;
+								}
+							}
+
 							$timestamp = time() - 86400;
 							$date = strtotime("+7 day", $timestamp);
 							$exp = date('d-m-Y', $date);
@@ -98,6 +114,8 @@ class daftar extends CI_Controller
 							$data_post['EXP_AKTIVASI'] = $exp;
 							$data_post['PASSWORD'] = md5($data_post["PASSWORD"]);
 							$data_post['STATUS'] = 0;
+							// print_r($data_post);die;
+
 
 							$record = new User_sitepak_model($data_post);
 							$affected_rows = $record->save();
@@ -109,13 +127,12 @@ class daftar extends CI_Controller
 									'data' => null
 								];
 							} else {
-								$imagePath = './application/assets/captcha';
-
+								// Remove existing captcha images
+								$imagePath = './assets/captcha';
 								if (file_exists($imagePath)) {
-									// Assuming you want to delete all files in the ./captcha directory
 									$files = glob($imagePath . '/*');
 									foreach ($files as $file) {
-										unlink($file); // Delete each file
+										unlink($file);
 									}
 								}
 
@@ -143,6 +160,18 @@ class daftar extends CI_Controller
 		$data_post = json_decode($input_data, true);
 		$hasil = [];
 
+		// Captcha verification
+		$captcha_word_session = $this->session->userdata('captcha_word');
+		if (empty($captcha_word_session) || $data_post['captcha'] !== $captcha_word_session) {
+			$hasil = [
+				'status' => false,
+				'message' => 'Captcha tidak valid',
+				'data' => null
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+			return;
+		}
+
 		if ($data_post['status'] == "") {
 			$hasil = [
 				'status' => false,
@@ -156,8 +185,17 @@ class daftar extends CI_Controller
 			));
 
 			if (!empty($userModel) && $data_post['nik'] == $userModel[0]->nik) {
-				$userModel[0]->status = $data_post['status'];
+				$userModel[0]->status = 1;
 				$userModel[0]->save();
+
+				$imagePath = './assets/captcha';
+
+				if (file_exists($imagePath)) {
+					$files = glob($imagePath . '/*');
+					foreach ($files as $file) {
+						unlink($file);
+					}
+				}
 
 				$hasil = [
 					'status' => true,
@@ -207,10 +245,10 @@ class daftar extends CI_Controller
 		$data_post = json_decode($input_data, true);
 		$hasil = [];
 		//print_r($data_post['REGISTRASI']['nik']);
-		if ($data_post['LUPA_PASS']["NIK"] == "" || $data_post['LUPA_PASS']["EMAIL"] == "") {
+		if ($data_post["NIK"] == "" || $data_post["EMAIL"] == "") {
 			$hasil = "ada yg kosong";
 		} else {
-			$numRecords = count(User_sitepak_model::get_criteria(array("NIK" => $data_post['LUPA_PASS']["NIK"], "EMAIL" => $data_post['LUPA_PASS']["EMAIL"])));
+			$numRecords = count(User_sitepak_model::get_criteria(array("NIK" => $data_post["NIK"], "EMAIL" => $data_post["EMAIL"])));
 			if ($numRecords == 0) {
 				//$hasil = "Tidak ditemukan";
 				$hasil = 2;
