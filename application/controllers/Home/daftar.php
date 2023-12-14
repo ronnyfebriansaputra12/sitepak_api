@@ -171,13 +171,8 @@ class daftar extends CI_Controller
 			$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 			return;
 		}
-
-		if ($data_post['status'] == "") {
-			$hasil = [
-				'status' => false,
-				'message' => 'Tidak Boleh Ada Yang Kosong',
-				'data' => null
-			];
+		if ($data_post["NIK"] == "" || $data_post["NO_KK"] == "" || $data_post["EMAIL"] == "" || $data_post["KODE_VERIFIKASI"] == "") {
+			$hasil = "Tidak Boleh Ada Yang Kosong";
 		} else {
 			$userModel = User_sitepak_model::get_criteria(array(
 				"select" => "nik,status",
@@ -211,6 +206,7 @@ class daftar extends CI_Controller
 			}
 		}
 
+
 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 	}
 
@@ -238,21 +234,101 @@ class daftar extends CI_Controller
 		return $randomString;
 	}
 
+	// function lupa_password()
+	// {
+	// 	// tambahkan table untuk history NIK token dan tgl token, kemudian buat jegatan perhari maksimal request token
+	// 	$input_data = file_get_contents('php://input');
+	// 	$data_post = json_decode($input_data, true);
+	// 	$hasil = [];
+
+
+
+	// 	$captcha_word_session = $this->session->userdata('captcha_word');
+	// 	if (empty($captcha_word_session) || $data_post['captcha'] !== $captcha_word_session) {
+	// 		$hasil = [
+	// 			'status' => false,
+	// 			'message' => 'Captcha tidak valid',
+	// 			'data' => null
+	// 		];
+	// 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+	// 		return;
+	// 	}
+
+	// 	if ($data_post["nik"] == "" || $data_post["email"] == "") {
+	// 		$hasil = "ada yg kosong";
+	// 	} else {
+	// 		$numRecords = count(User_sitepak_model::get_criteria(array("nik" => $data_post["nik"], "email" => $data_post["email"])));
+	// 		if ($numRecords == 0) {
+	// 			//$hasil = "Tidak ditemukan";
+	// 			$hasil = 2;
+	// 		} else {
+	// 			$_EXISTED = TRUE;
+	// 			$_USERNAME = "";
+
+	// 			while ($_EXISTED) {
+	// 				$_NUM = $this->generateRandomString();
+	// 				$cekNUM = count(User_sitepak_model::get_criteria(array('TOKEN' => $_NUM)));
+	// 				if ($cekNUM == 0) {
+	// 					$TOKEN = $_NUM;
+	// 					$_EXISTED = FALSE;
+	// 				}
+	// 			}
+	// 			$newPass = $this->generateRandomStringPassword();
+	// 			$passDecrypt = md5($newPass);
+	// 			$date = date('d-m-Y H:i:s');
+	// 			$data_post['password'] = $passDecrypt;
+	// 			$data_post['tgl_token'] = $date;
+	// 			$data_post['token'] = $TOKEN;
+	// 			$recUser = User_sitepak_model::get_criteria(array("nik" => $data_post["nik"], "email" => $data_post["email"]));
+	// 			$affected_rows = $recUser[0]->update_attributes($data_post);
+
+	// 			if (!$affected_rows) {
+	// 				$hasil = 0;
+	// 			} else {
+	// 				$pesan = "Password Baru Anda adalah : " . $newPass;
+	// 				$configEmail = $this->config->item('email');
+	// 				$this->email->initialize($configEmail);
+	// 				$this->email->from($configEmail['smtp_user']);
+	// 				$this->email->to($recUser[0]->email);
+	// 				$this->email->subject('RESET PASSWORD');
+	// 				$this->email->message($pesan);
+
+	// 				if (!$this->email->send()) {
+	// 					echo $this->email->print_debugger();
+	// 				}
+	// 				$hasil = 1;
+	// 			}
+	// 		}
+	// 	}
+	// 	$this->output->set_content_type('application/json')
+	// 		->set_output($hasil);
+	// }
+
 	function lupa_password()
 	{
-		// tambahkan table untuk history NIK token dan tgl token, kemudian buat jegatan perhari maksimal request token
 		$input_data = file_get_contents('php://input');
 		$data_post = json_decode($input_data, true);
 		$hasil = [];
-		//print_r($data_post['REGISTRASI']['nik']);
+
+		$captcha_word_session = $this->session->userdata('captcha_word');
+		if (empty($captcha_word_session) || $data_post['CAPTCHA'] !== $captcha_word_session) {
+			$hasil = [
+				'status' => false,
+				'message' => 'Captcha tidak valid',
+				'data' => null
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+			return;
+		}
+
 		if ($data_post["NIK"] == "" || $data_post["EMAIL"] == "") {
-			$hasil = "ada yg kosong";
+			$hasil = "ada yang kosong";
 		} else {
 			$numRecords = count(User_sitepak_model::get_criteria(array("NIK" => $data_post["NIK"], "EMAIL" => $data_post["EMAIL"])));
 			if ($numRecords == 0) {
-				//$hasil = "Tidak ditemukan";
-				$hasil = 2;
+				$hasil = 2; // User not found
 			} else {
+				$recUser = User_sitepak_model::get_criteria(array("NIK" => $data_post["NIK"], "EMAIL" => $data_post["EMAIL"]));
 				$_EXISTED = TRUE;
 				$_USERNAME = "";
 
@@ -264,19 +340,19 @@ class daftar extends CI_Controller
 						$_EXISTED = FALSE;
 					}
 				}
+
 				$newPass = $this->generateRandomStringPassword();
 				$passDecrypt = md5($newPass);
 				$date = date('d-m-Y H:i:s');
-				$data_post['LUPA_PASS']['PASSWORD'] = $passDecrypt;
-				$data_post['LUPA_PASS']['TGL_TOKEN'] = $date;
-				$data_post['LUPA_PASS']['TOKEN'] = $TOKEN;
-				$recUser = User_sitepak_model::get_criteria(array("NIK" => $data_post['LUPA_PASS']["NIK"], "EMAIL" => $data_post['LUPA_PASS']["EMAIL"]));
-				$affected_rows = $recUser[0]->update_attributes($data_post['LUPA_PASS']);
 
-				if (!$affected_rows) {
-					$hasil = 0;
-				} else {
+				$recUser[0]->password = $passDecrypt;
+				$recUser[0]->tgl_token = $date;
+				$recUser[0]->token = $TOKEN;
+
+				if ($recUser[0]->save()) {
 					$pesan = "Password Baru Anda adalah : " . $newPass;
+
+					// Send email with the new password
 					$configEmail = $this->config->item('email');
 					$this->email->initialize($configEmail);
 					$this->email->from($configEmail['smtp_user']);
@@ -287,13 +363,20 @@ class daftar extends CI_Controller
 					if (!$this->email->send()) {
 						echo $this->email->print_debugger();
 					}
-					$hasil = 1;
+
+					$hasil = 1; // Success
+				} else {
+					$hasil = 0; // Failed to update password
 				}
 			}
 		}
-		$this->output->set_content_type('application/json')
-			->set_output($hasil);
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 	}
+
+
+
+
 
 	function aktivasi()
 	{

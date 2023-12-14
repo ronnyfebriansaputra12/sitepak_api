@@ -17,7 +17,20 @@
 
 /* Pastikan konfigurasi php_openssl.so atau php_openssl.ddl sudah diaktifkan di php.ini */
 
-$config['email'] = Array(
+// $config['email'] = Array(
+// 							'newline'	=> "\r\n",
+// 							'mailtype'	=> 'html',
+// 							'protocol'  => 'smtp',
+// 							'smtp_host' => "mail.bekasikab.go.id",
+// 							'smtp_port' => '25',
+// 							'smtp_user' => 'disdukcapil@bekasikab.go.id',
+// 							'smtp_pass' => 'j4ng4nm41nm41nd3ng4nb3k4s1',
+// 							'smtp_crypto'=>'tls',
+// 							'charset'	=> 'iso-8859-1',
+// 							'smtp_timeout'=> '10'
+// 						 );
+
+						 $config['email'] = Array(
 							'newline'	=> "\r\n",
 							'mailtype'	=> 'html',
 							'protocol'  => 'smtp',
