@@ -408,35 +408,115 @@ class daftar extends CI_Controller
 			->set_output($hasil);
 	}
 
+	// function update_password()
+	// {
+	// 	// tambahkan table untuk history NIK token dan tgl token, kemudian buat jegatan perhari maksimal request token
+	// 	$input_data = file_get_contents('php://input');
+	// 	$data_post = json_decode($input_data, true);
+	// 	$hasil = [];
+	// 	//print_r($data_post['REGISTRASI']['nik']);
+	// 	if ($data_post["nik"] == "" || $data_post["old_password"] == "") {
+	// 		$hasil = "ada yg kosong";
+	// 	} else {
+	// 		$oldPassword = md5($data_post["old_password"]);
+	// 		$numRecords = count(User_sitepak_model::get_criteria(array("nik" => $data_post["nik"], "password" => $oldPassword)));
+	// 		if ($numRecords == 0) {
+	// 			$hasil = [
+	// 				'status' => false,
+	// 				'message' => 'Data Not Found',
+	// 				'data' => null
+	// 			];
+	// 		} else {
+	// 			$data_post['password'] = md5($data_post["password_baru"]);
+	// 			$recUser = User_sitepak_model::get_criteria(array("nik" => $data_post["nik"], "password" => $oldPassword));
+	// 			$affected_rows = $recUser[0]->update_attributes($data_post);
+
+	// 			if (!$affected_rows) {
+	// 				$hasil = 0;
+	// 			} else {
+
+	// 				$hasil = 1;
+	// 			}
+	// 		}
+	// 	}
+	// 	$this->output->set_content_type('application/json')
+	// 		->set_output($hasil);
+	// }
+
 	function update_password()
 	{
-		// tambahkan table untuk history NIK token dan tgl token, kemudian buat jegatan perhari maksimal request token
+		// Periksa apakah ada data yang dikirimkan
 		$input_data = file_get_contents('php://input');
+		if (empty($input_data)) {
+			http_response_code(400); // Bad Request
+			return;
+		}
+
 		$data_post = json_decode($input_data, true);
-		$hasil = [];
-		//print_r($data_post['REGISTRASI']['nik']);
-		if ($data_post['LUPA_PASS']["NIK"] == "" || $data_post['LUPA_PASS']["OLD_PASSWORD"] == "") {
-			$hasil = "ada yg kosong";
+
+		// Periksa apakah data yang diperlukan ada
+		if (empty($data_post["nik"]) || empty($data_post["password_lama"]) || empty($data_post["password_baru"]) || empty($data_post["password_confirmasi"])) {
+			$hasil = [
+				'status' => false,
+				'message' => 'Ada data yang kosong',
+				'data' => null
+			];
 		} else {
-			$oldPassword = md5($data_post['LUPA_PASS']["OLD_PASSWORD"]);
-			$numRecords = count(User_sitepak_model::get_criteria(array("NIK" => $data_post['LUPA_PASS']["NIK"], "PASSWORD" => $oldPassword)));
+			$password_lama = md5($data_post["password_lama"]);
+			$password_baru = md5($data_post["password_baru"]);
+			$password_confirmasi = md5($data_post["password_confirmasi"]);
+
+			// Periksa apakah data pengguna ditemukan berdasarkan NIK
+			$userCriteria = array("nik" => $data_post["nik"]);
+			$recUser = User_sitepak_model::get_criteria($userCriteria);
+			$numRecords = count($recUser);
+
 			if ($numRecords == 0) {
-				//$hasil = "Tidak ditemukan";
-				$hasil = 2;
+				$hasil = [
+					'status' => false,
+					'message' => 'Data pengguna tidak ditemukan',
+					'data' => null
+				];
 			} else {
-				$data_post['RESET']['PASSWORD'] = md5($data_post['LUPA_PASS']["RENEW_PASSWORD"]);
-				$recUser = User_sitepak_model::get_criteria(array("NIK" => $data_post['LUPA_PASS']["NIK"], "PASSWORD" => $oldPassword));
-				$affected_rows = $recUser[0]->update_attributes($data_post['RESET']);
-
-				if (!$affected_rows) {
-					$hasil = 0;
+				// Periksa apakah password lama sesuai
+				if ($recUser[0]->password != $password_lama) {
+					$hasil = [
+						'status' => false,
+						'message' => 'Password lama tidak sesuai',
+						'data' => null
+					];
 				} else {
+					// Periksa apakah password baru sesuai dengan konfirmasi
+					if ($password_baru != $password_confirmasi) {
+						$hasil = [
+							'status' => false,
+							'message' => 'Password baru tidak sesuai dengan konfirmasi',
+							'data' => null
+						];
+					} else {
+						// Update password
+						$recUser[0]->password = $password_baru;
 
-					$hasil = 1;
+						// Simpan perubahan
+						if ($recUser[0]->save()) {
+							$hasil = [
+								'status' => true,
+								'message' => 'Kata sandi berhasil diubah',
+								'data' => null
+							];
+						} else {
+							$hasil = [
+								'status' => false,
+								'message' => 'Gagal mengubah kata sandi',
+								'data' => null
+							];
+						}
+					}
 				}
 			}
 		}
-		$this->output->set_content_type('application/json')
-			->set_output($hasil);
+
+		// Set response sebagai JSON
+		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 	}
 }
