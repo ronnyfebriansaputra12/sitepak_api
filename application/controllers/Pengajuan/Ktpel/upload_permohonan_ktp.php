@@ -241,4 +241,224 @@ class upload_permohonan_ktp extends CI_Controller
 		// Set the response content type and output the result as JSON
 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 	}
+
+	// function update_pengajuan_ktp()
+	// {
+	// 	$data_post = $_POST;
+	// 	$hasil = [];
+
+	// 	$headers = apache_request_headers();
+
+	// 	if (!isset($headers['Authorization'])) {
+	// 		$hasil = [
+	// 			'status' => false,
+	// 			'message' => 'Authorization token not found in headers',
+	// 			'data' => null
+	// 		];
+	// 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+	// 		return;
+	// 	}
+
+	// 	$jwt_token = str_replace('Bearer ', '', $headers['Authorization']);
+
+	// 	if (!$jwt_token) {
+	// 		$hasil = [
+	// 			'status' => false,
+	// 			'message' => 'Invalid token format',
+	// 			'data' => null
+	// 		];
+	// 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+	// 		return;
+	// 	}
+
+	// 	// Check if required fields are not empty
+	// 	if (empty($data_post["DAFTARID"]) || empty($data_post["NIK"]) || empty($data_post["NO_KK"]) || empty($data_post["NAMA_LGKP"]) || empty($data_post["KEC"]) || empty($data_post["KEL"]) || empty($data_post["ALASAN"]) || empty($data_post["PENGAMBILAN"]) || empty($_FILES['SC_KTP'])) {
+	// 		$hasil = [
+	// 			'status' => false,
+	// 			'message' => 'Gagal Update Permohonan, Silahkan Lengkapi Semua Data',
+	// 			'data' => null
+	// 		];
+	// 	} else {
+	// 		// $existingRecord = Daftar_ktp_model::find_by_id($data_post["DAFTARID"]);
+	// 		$existingRecord = Daftar_ktp_model::get_criteria(['where' => ['daftarid' => $data_post["DAFTARID"]]]);
+
+
+	// 		if (!$existingRecord) {
+	// 			$hasil = [
+	// 				'status' => false,
+	// 				'message' => 'Record not found for the given DAFTARID',
+	// 				'data' => null
+	// 			];
+	// 		} else {
+	// 			// Proceed with the update logic, similar to the create logic
+
+	// 			// Check for active or pending applications with the same NIK
+	// 			$checkRecordAktif = Daftar_ktp_model::get_criteria(array("NIK" => $data_post["NIK"], "STATUS" => array(1, 2)));
+
+	// 			if (count($checkRecordAktif) > 0) {
+	// 				// Handle the case where an active or pending application with the same NIK already exists
+	// 				// You can customize the response messages as needed
+	// 				$hasil = [
+	// 					'status' => false,
+	// 					'message' => 'Record with NIK already has an active or pending application',
+	// 					'data' => null
+	// 				];
+	// 			} else {
+	// 				// Update the record with the new data
+	// 				$existingRecord->NIK = $data_post["NIK"];
+	// 				$existingRecord->NO_KK = $data_post["NO_KK"];
+	// 				$existingRecord->NAMA_LGKP = $data_post["NAMA_LGKP"];
+	// 				$existingRecord->NO_KEC = $data_post["KEC"];
+	// 				$existingRecord->NO_KEL = $data_post["KEL"];
+	// 				$existingRecord->ALASAN = $data_post["ALASAN"];
+	// 				$existingRecord->PENGAMBILAN = $data_post["PENGAMBILAN"];
+
+	// 				// Handle file upload for SC_KTP
+	// 				$photo_file = $_FILES['SC_KTP'];
+	// 				$upload_dir = './assets/pengajuan/ktp/';
+	// 				$photo_path = $upload_dir . $data_post['NIK'] . '_pengajuan_ktp.jpg';
+
+	// 				if (move_uploaded_file($photo_file['tmp_name'], $photo_path)) {
+	// 					$existingRecord->SC_KTP = $photo_path;
+	// 				} else {
+	// 					$hasil = [
+	// 						'status' => false,
+	// 						'message' => 'Gagal mengunggah foto bukti',
+	// 						'data' => null
+	// 					];
+	// 				}
+
+	// 				// Save the updated record
+	// 				$affected_rows = $existingRecord->save();
+
+	// 				if (!$affected_rows) {
+	// 					$hasil = [
+	// 						'status' => false,
+	// 						'message' => 'Failed to update KTP application',
+	// 						'data' => null
+	// 					];
+	// 				} else {
+	// 					$hasil = [
+	// 						'status' => true,
+	// 						'message' => 'Permohonan KTP berhasil diupdate',
+	// 						'data' => $existingRecord
+	// 					];
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+
+	// 	$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+	// }
+
+	function update_pengajuan_ktp()
+	{
+		$data_post = $_POST;
+		$hasil = [];
+
+		$headers = apache_request_headers();
+
+		if (!isset($headers['Authorization'])) {
+			$hasil = [
+				'status' => false,
+				'message' => 'Authorization token not found in headers',
+				'data' => null
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+			return;
+		}
+
+		$jwt_token = str_replace('Bearer ', '', $headers['Authorization']);
+
+		if (!$jwt_token) {
+			$hasil = [
+				'status' => false,
+				'message' => 'Invalid token format',
+				'data' => null
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+			return;
+		}
+
+		// Check if required fields are not empty
+		if (empty($data_post["NO_KK"]) || empty($data_post["NAMA_LGKP"]) || empty($data_post["NIK"]) || empty($data_post["KEC"]) || empty($data_post["KEL"]) || empty($data_post["ALASAN"]) || empty($data_post["PENGAMBILAN"]) || empty($_FILES['SC_KTP'])) {
+			$hasil = [
+				'status' => false,
+				'message' => 'Gagal Update Permohonan, Silahkan Lengkapi Semua Data',
+				'data' => null
+			];
+		} else {
+			// Find the record based on NIK
+			$existingRecords = Daftar_ktp_model::get_criteria(['where' => ['NIK' => $data_post["NIK"]]]);
+
+			if (empty($existingRecords)) {
+				$hasil = [
+					'status' => false,
+					'message' => 'Record not found for the given NIK',
+					'data' => null
+				];
+			} else {
+				// Assuming there might be multiple records with the same NIK, update all of them
+				foreach ($existingRecords as $existingRecord) {
+					// Update the record with the new data
+					$existingRecord->nik = $data_post["NIK"];
+					$existingRecord->no_kk = $data_post["NO_KK"];
+					$existingRecord->nama_lgkp = $data_post["NAMA_LGKP"];
+					$existingRecord->no_kec = $data_post["KEC"];
+					$existingRecord->no_kel = $data_post["KEL"];
+					$existingRecord->alasan = $data_post["ALASAN"];
+					$existingRecord->pengambilan = $data_post["PENGAMBILAN"];
+
+					// Handle file upload for SC_KTP
+					$photo_file = $_FILES['SC_KTP'];
+					$upload_dir = './assets/pengajuan/ktp/';
+					$photo_path = $upload_dir . $data_post['NIK'] . '_pengajuan_ktp.jpg';
+
+					if (move_uploaded_file($photo_file['tmp_name'], $photo_path)) {
+						$existingRecord->sc_ktp = $photo_path;
+					} else {
+						$hasil = [
+							'status' => false,
+							'message' => 'Gagal mengunggah foto bukti',
+							'data' => null
+						];
+					}
+
+					// Save the updated record
+					$affected_rows = $existingRecord->save();
+
+					if (!$affected_rows) {
+						$hasil = [
+							'status' => false,
+							'message' => 'Failed to update KTP application',
+							'data' => null
+						];
+					} else {
+						$display_data = [
+							'daftarid' => $existingRecord->daftarid,
+							'nik' => $existingRecord->nik,
+							'no_kk' => $existingRecord->no_kk,
+							'nama_lgkp' => $existingRecord->nama_lgkp,
+							'alasan' => $existingRecord->alasan,
+							'status' => $existingRecord->status,
+							'alasan' => $existingRecord->alasan,
+							'no_kec' => $existingRecord->no_kec,
+							'no_kel' => $existingRecord->no_kel,
+							'pengambilan' => $existingRecord->pengambilan,
+							'tgl_permohonan' => $existingRecord->tgl_permohonan,
+							'sc_ktp' => $existingRecord->sc_ktp,
+						];
+
+						$hasil = [
+							'status' => true,
+							'message' => 'Permohonan KTP berhasil diupdate',
+							'data' => $display_data  // Include the updated data in the response
+						];
+					}
+				}
+			}
+		}
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+	}
 }
