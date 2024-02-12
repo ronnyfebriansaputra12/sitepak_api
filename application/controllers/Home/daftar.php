@@ -156,13 +156,12 @@ class daftar extends CI_Controller
 
 	function aktivasiUser()
 	{
-		$input_data = file_get_contents('php://input');
-		$data_post = json_decode($input_data, true);
+		$data_post = $_POST;
 		$hasil = [];
 
 		// Captcha verification
 		$captcha_word_session = $this->session->userdata('captcha_word');
-		if (empty($captcha_word_session) || $data_post['captcha'] !== $captcha_word_session) {
+		if (empty($captcha_word_session) || $data_post['CAPTCHA'] !== $captcha_word_session) {
 			$hasil = [
 				'status' => false,
 				'message' => 'Captcha tidak valid',
@@ -171,15 +170,15 @@ class daftar extends CI_Controller
 			$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 			return;
 		}
-		if ($data_post["NIK"] == "" || $data_post["NO_KK"] == "" || $data_post["EMAIL"] == "" || $data_post["KODE_VERIFIKASI"] == "") {
+		if ($data_post["NIK"] == "" || $data_post["EMAIL"] == "" || $data_post["CAPTCHA"] == "") {
 			$hasil = "Tidak Boleh Ada Yang Kosong";
 		} else {
 			$userModel = User_sitepak_model::get_criteria(array(
 				"select" => "nik,status",
-				"where" => array("nik" => $data_post["nik"])
+				"where" => array("nik" => $data_post["NIK"])
 			));
 
-			if (!empty($userModel) && $data_post['nik'] == $userModel[0]->nik) {
+			if (!empty($userModel) && $data_post['NIK'] == $userModel[0]->nik) {
 				$userModel[0]->status = 1;
 				$userModel[0]->save();
 
@@ -200,7 +199,7 @@ class daftar extends CI_Controller
 			} else {
 				$hasil = [
 					'status' => false,
-					'message' => 'User dengan NIK ' . $data_post["nik"] . ' tidak ditemukan',
+					'message' => 'User dengan NIK ' . $data_post["NIK"] . ' tidak ditemukan',
 					'data' => null
 				];
 			}
@@ -306,8 +305,7 @@ class daftar extends CI_Controller
 
 	function lupa_password()
 	{
-		$input_data = file_get_contents('php://input');
-		$data_post = json_decode($input_data, true);
+		$data_post = $_POST;
 		$hasil = [];
 
 		$captcha_word_session = $this->session->userdata('captcha_word');
@@ -446,28 +444,30 @@ class daftar extends CI_Controller
 	function update_password()
 	{
 		// Periksa apakah ada data yang dikirimkan
-		$input_data = file_get_contents('php://input');
-		if (empty($input_data)) {
+		$data_post = $_POST;
+		$hasil = [];
+	
+		if (empty($data_post)) {
 			http_response_code(400); // Bad Request
 			return;
 		}
 
-		$data_post = json_decode($input_data, true);
+		// $data_post = json_decode($input_data, true);
 
 		// Periksa apakah data yang diperlukan ada
-		if (empty($data_post["nik"]) || empty($data_post["password_lama"]) || empty($data_post["password_baru"]) || empty($data_post["password_confirmasi"])) {
+		if (empty($data_post["NIK"]) || empty($data_post["PASSWORD_LAMA"]) || empty($data_post["PASSWORD_BARU"]) || empty($data_post["PASSWORD_CONFIRMATION"])) {
 			$hasil = [
 				'status' => false,
 				'message' => 'Ada data yang kosong',
 				'data' => null
 			];
 		} else {
-			$password_lama = md5($data_post["password_lama"]);
-			$password_baru = md5($data_post["password_baru"]);
-			$password_confirmasi = md5($data_post["password_confirmasi"]);
+			$password_lama = md5($data_post["PASSWORD_LAMA"]);
+			$password_baru = md5($data_post["PASSWORD_BARU"]);
+			$password_confirmasi = md5($data_post["PASSWORD_CONFIRMATION"]);
 
 			// Periksa apakah data pengguna ditemukan berdasarkan NIK
-			$userCriteria = array("nik" => $data_post["nik"]);
+			$userCriteria = array("nik" => $data_post["NIK"]);
 			$recUser = User_sitepak_model::get_criteria($userCriteria);
 			$numRecords = count($recUser);
 

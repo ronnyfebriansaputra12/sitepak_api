@@ -58,6 +58,7 @@ class upload_permohonan_ktp extends CI_Controller
 		$data_post = $_POST;
 		$hasil = [];
 
+		// print_r($data_post);die;
 		$headers = apache_request_headers();
 
 		if (!isset($headers['Authorization'])) {
@@ -82,10 +83,16 @@ class upload_permohonan_ktp extends CI_Controller
 			return;
 		}
 
-		// print_r($data_post);die;
-
-		// Check if required fields are not empty
-		if (empty($data_post["NIK"]) || empty($data_post["NO_KK"]) || empty($data_post["NAMA_LGKP"]) || empty($data_post["KEC"]) || empty($data_post["KEL"]) || empty($data_post["ALASAN"]) || empty($data_post["PENGAMBILAN"]) || empty($data_post["DAFTARID"]) || empty($_FILES['SC_KTP'])) {
+		if (empty($data_post["NIK"]) || 
+			empty($data_post["NO_KK"]) ||
+		 	empty($data_post["NAMA_LGKP"]) ||
+		  	empty($data_post["KEC"]) || 
+			empty($data_post["KEL"]) || 
+			empty($data_post["ALASAN"]) || 
+			empty($data_post['DESKRIPSI']) || 
+			empty($data_post["PENGAMBILAN"]) ||
+			empty($data_post["DAFTARID"]) || 
+			empty($_FILES['SC_KTP'])) {
 			$hasil = [
 				'status' => false,
 				'message' => 'Gagal Ajukan Permohonan, Silahkan Lengkapi Semua Data',
@@ -123,6 +130,7 @@ class upload_permohonan_ktp extends CI_Controller
 						$data_ktp['NO_KEC'] = $data_post["KEC"];
 						$data_ktp['NO_KEL'] = $data_post["KEL"];
 						$data_ktp['ALASAN'] = $data_post["ALASAN"];
+						$data_ktp['DESKRIPSI'] = $data_post["DESKRIPSI"];
 						$data_ktp['SC_KTP'] = $photo_path;
 						$data_ktp['PENGAMBILAN'] = $data_post["PENGAMBILAN"];
 						// $data_ktp['AKUN'] = $data_post["AKUN"];
@@ -192,7 +200,7 @@ class upload_permohonan_ktp extends CI_Controller
 			return;
 		}
 
-		$jwt_secret = "sitepak2023";
+		$jwt_secret = $this->config->item('jwt_secret');
 
 		try {
 			$token_data = JWT::decode($jwt_token, new Key($jwt_secret, 'HS256'));
@@ -217,6 +225,7 @@ class upload_permohonan_ktp extends CI_Controller
 					'alasan' => $pengajuanKtp[0]->alasan,
 					'status' => $pengajuanKtp[0]->status,
 					'alasan' => $pengajuanKtp[0]->alasan,
+					'deskripsi' => $pengajuanKtp[0]->deskripsi,
 					'no_kec' => $pengajuanKtp[0]->no_kec,
 					'no_kel' => $pengajuanKtp[0]->no_kel,
 					'tgl_permohonan' => $pengajuanKtp[0]->tgl_permohonan,
@@ -381,7 +390,7 @@ class upload_permohonan_ktp extends CI_Controller
 		}
 
 		// Check if required fields are not empty
-		if (empty($data_post["NO_KK"]) || empty($data_post["NAMA_LGKP"]) || empty($data_post["NIK"]) || empty($data_post["KEC"]) || empty($data_post["KEL"]) || empty($data_post["ALASAN"]) || empty($data_post["PENGAMBILAN"]) || empty($_FILES['SC_KTP'])) {
+		if (empty($data_post["NO_KK"]) || empty($data_post["NAMA_LGKP"]) || empty($data_post["NIK"]) || empty($data_post["KEC"]) || empty($data_post["KEL"]) || empty($data_post["ALASAN"]) || empty($data_post["DESKRIPSI"]) || empty($data_post["PENGAMBILAN"]) || empty($_FILES['SC_KTP'])) {
 			$hasil = [
 				'status' => false,
 				'message' => 'Gagal Update Permohonan, Silahkan Lengkapi Semua Data',
@@ -407,6 +416,7 @@ class upload_permohonan_ktp extends CI_Controller
 					$existingRecord->no_kec = $data_post["KEC"];
 					$existingRecord->no_kel = $data_post["KEL"];
 					$existingRecord->alasan = $data_post["ALASAN"];
+					$existingRecord->deskripsi = $data_post["DESKRIPSI"];
 					$existingRecord->pengambilan = $data_post["PENGAMBILAN"];
 
 					// Handle file upload for SC_KTP
@@ -442,6 +452,7 @@ class upload_permohonan_ktp extends CI_Controller
 							'alasan' => $existingRecord->alasan,
 							'status' => $existingRecord->status,
 							'alasan' => $existingRecord->alasan,
+							'deskripsi' => $existingRecord->deskripsi,
 							'no_kec' => $existingRecord->no_kec,
 							'no_kel' => $existingRecord->no_kel,
 							'pengambilan' => $existingRecord->pengambilan,

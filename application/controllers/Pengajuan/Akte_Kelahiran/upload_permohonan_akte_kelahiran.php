@@ -177,7 +177,26 @@ class upload_permohonan_akte_kelahiran extends CI_Controller
 			return;
 		}
 
-		if ($data_post["NO_KK"] == "" || $data_post["KEC"] == "" || $data_post["KEL"] == "" || $data_post["DAFTARID"] == "" || $data_post["AKUN"] == "" || $data_post["NIK_BAYI"] == "" || $data_post["NAMA_BAYI"] == "" || $data_post["ANAK_KE"] == "" || $data_post["BERAT_BAYI"] == "" || $data_post["JENIS_KELAHIRAN"] == "" || $data_post["TEMPAT_KELAHIRAN"] == "" || $data_post["PENOLONG_KELAHIRAN"] == "" || $_FILES["FORMULIR"] == "" || $_FILES["BUKTI_NIKAH_FOTO"] == "" || $_FILES["KTP_ORTU_FOTO"] == "" || $_FILES["BUKTI_LAHIR_FOTO"] == "") {
+		if ($data_post["NO_KK"] == "" ||
+		 	$data_post["KEC"] == "" ||
+			$data_post["KEL"] == "" ||
+			$data_post["DAFTARID"] == "" ||
+			$data_post["AKUN"] == "" ||
+			$data_post["NIK_BAYI"] == "" ||
+			$data_post["NAMA_BAYI"] == "" ||
+			$data_post["ANAK_KE"] == "" ||
+			$data_post["BERAT_BAYI"] == "" ||
+			$data_post["JENIS_KELAHIRAN"] == "" ||
+			$data_post["TEMPAT_KELAHIRAN"] == "" ||
+			$data_post["PENOLONG_KELAHIRAN"] == "" ||
+			$data_post["DESKRIPSI_FORMULIR_F201"] == "" ||
+			$data_post["DESKRIPSI_BUKU_NIKAH"] == "" ||
+			$data_post["DESKRIPSI_FOTO_KTP"] == "" ||
+			$data_post["DESKRIPSI_FOTO_BUKTI_LAHIR"] == "" ||
+			$_FILES["FORMULIR"] == "" || 
+			$_FILES["BUKTI_NIKAH_FOTO"] == "" || 
+			$_FILES["KTP_ORTU_FOTO"] == "" || 
+			$_FILES["BUKTI_LAHIR_FOTO"] == "") {
 			$hasil = [
 				'status' => false,
 				'message' => 'Gagal Ajukan Permohonan, Silahkan Coba Ajukan Permohonan Ulang',
@@ -225,6 +244,10 @@ class upload_permohonan_akte_kelahiran extends CI_Controller
 					$data_ktp['JENIS_LAHIR'] = $data_post["JENIS_KELAHIRAN"];
 					$data_ktp['TEMPAT_LHR'] = $data_post["TEMPAT_KELAHIRAN"];
 					$data_ktp['PENOLONG_LHR'] = $data_post["PENOLONG_KELAHIRAN"];
+					$data_ktp['DESKRIPSI_FORMULIR_F201'] = $data_post["DESKRIPSI_FORMULIR_F201"];
+					$data_ktp['DESKRIPSI_BUKU_NIKAH'] = $data_post["DESKRIPSI_BUKU_NIKAH"];
+					$data_ktp['DESKRIPSI_FOTO_KTP'] = $data_post["DESKRIPSI_FOTO_KTP"];
+					$data_ktp['DESKRIPSI_FOTO_BUKTI_LAHIR'] = $data_post["DESKRIPSI_FOTO_BUKTI_LAHIR"];
 					$data_ktp['FORMULIR'] = $photo_path_formulir;
 					$data_ktp['BUKTI_NIKAH_FOTO'] = $photo_path_bukti_nikah;
 					$data_ktp['KTP_ORTU_FOTO'] = $photo_path_ktp_ortu;
@@ -298,7 +321,8 @@ class upload_permohonan_akte_kelahiran extends CI_Controller
 			return;
 		}
 
-		$jwt_secret = "sitepak2023";
+		$jwt_secret = $this->config->item('jwt_secret');
+
 
 		try {
 			$token_data = JWT::decode($jwt_token, new Key($jwt_secret, 'HS256'));
@@ -324,9 +348,14 @@ class upload_permohonan_akte_kelahiran extends CI_Controller
 					'anak_ke' => $pengajuanKtp[0]->anak_ke,
 					'berat_bayi' => $pengajuanKtp[0]->berat_bayi,
 					'jenis_lahir' => $pengajuanKtp[0]->jenis_lahir,
+					'penolong_lhr' => $pengajuanKtp[0]->penolong_lhr,
 					'status' => $pengajuanKtp[0]->status,
 					'no_kec' => $pengajuanKtp[0]->no_kec,
 					'no_kel' => $pengajuanKtp[0]->no_kel,
+					'deskripsi_formulir_f201' => $pengajuanKtp[0]->deskripsi_formulir_f201,
+					'deskripsi_buku_nikah' => $pengajuanKtp[0]->deskripsi_buku_nikah,
+					'deskripsi_foto_ktp' => $pengajuanKtp[0]->deskripsi_foto_ktp,
+					'deskripsi_foto_bukti_lahir' => $pengajuanKtp[0]->deskripsi_foto_bukti_lahir,
 					'formulir' => $pengajuanKtp[0]->formulir,
 					'bukti_nikah_foto' => $pengajuanKtp[0]->bukti_nikah_foto,
 					'bukti_lahir_foto' => $pengajuanKtp[0]->bukti_lahir_foto,
@@ -381,7 +410,26 @@ class upload_permohonan_akte_kelahiran extends CI_Controller
 		}
 
 		// Check if required fields are not empty
-		if ($data_post["NO_KK"] == "" || $data_post["KEC"] == "" || $data_post["KEL"] == "" || $data_post["DAFTARID"] == "" || $data_post["AKUN"] == "" || $data_post["NIK_BAYI"] == "" || $data_post["NAMA_BAYI"] == "" || $data_post["ANAK_KE"] == "" || $data_post["BERAT_BAYI"] == "" || $data_post["JENIS_KELAHIRAN"] == "" || $data_post["TEMPAT_KELAHIRAN"] == "" || $data_post["PENOLONG_KELAHIRAN"] == "" || $_FILES["FORMULIR"] == "" || $_FILES["BUKTI_NIKAH_FOTO"] == "" || $_FILES["KTP_ORTU_FOTO"] == "" || $_FILES["BUKTI_LAHIR_FOTO"] == "") {
+		if ($data_post["NO_KK"] == "" ||
+		$data_post["KEC"] == "" ||
+		$data_post["KEL"] == "" ||
+		$data_post["DAFTARID"] == "" ||
+		$data_post["AKUN"] == "" ||
+		$data_post["NIK_BAYI"] == "" ||
+		$data_post["NAMA_BAYI"] == "" ||
+		$data_post["ANAK_KE"] == "" ||
+		$data_post["BERAT_BAYI"] == "" ||
+		$data_post["JENIS_KELAHIRAN"] == "" ||
+		$data_post["TEMPAT_KELAHIRAN"] == "" ||
+		$data_post["PENOLONG_KELAHIRAN"] == "" ||
+		$data_post["DESKRIPSI_FORMULIR_F201"] == "" ||
+		$data_post["DESKRIPSI_BUKU_NIKAH"] == "" ||
+		$data_post["DESKRIPSI_FOTO_KTP"] == "" ||
+		$data_post["DESKRIPSI_FOTO_BUKTI_LAHIR"] == "" ||
+		$_FILES["FORMULIR"] == "" ||
+		$_FILES["BUKTI_NIKAH_FOTO"] == "" ||
+		$_FILES["KTP_ORTU_FOTO"] == "" ||
+		$_FILES["BUKTI_LAHIR_FOTO"] == "") {
 			$hasil = [
 				'status' => false,
 				'message' => 'Gagal Update Permohonan, Silahkan Lengkapi Semua Data',
@@ -411,6 +459,10 @@ class upload_permohonan_akte_kelahiran extends CI_Controller
 					$existingRecord->jenis_lahir = $data_post["JENIS_KELAHIRAN"];
 					$existingRecord->tempat_lhr = $data_post["TEMPAT_KELAHIRAN"];
 					$existingRecord->penolong_lhr = $data_post["PENOLONG_KELAHIRAN"];
+					$existingRecord->deskripsi_formulir_f201 = $data_post["DESKRIPSI_FORMULIR_F201"];
+					$existingRecord->deskripsi_buku_nikah = $data_post["DESKRIPSI_BUKU_NIKAH"];
+					$existingRecord->deskripsi_foto_ktp = $data_post["DESKRIPSI_FOTO_KTP"];
+					$existingRecord->deskripsi_foto_bukti_lahir = $data_post["DESKRIPSI_FOTO_BUKTI_LAHIR"];
 
 					$photo_file_F201 = $_FILES['FORMULIR'];
 					$photo_file_NIKAH = $_FILES['BUKTI_NIKAH_FOTO'];
@@ -461,9 +513,14 @@ class upload_permohonan_akte_kelahiran extends CI_Controller
 							'anak_ke' => $existingRecord->anak_ke,
 							'berat_bayi' => $existingRecord->berat_bayi,
 							'jenis_lahir' => $existingRecord->jenis_lahir,
+							'penolong_lhr' => $existingRecord->penolong_lhr,
 							'status' => $existingRecord->status,
 							'no_kec' => $existingRecord->no_kec,
 							'no_kel' => $existingRecord->no_kel,
+							'deskripsi_formulir_f201' => $existingRecord->deskripsi_formulir_f201,
+							'deskripsi_buku_nikah' => $existingRecord->deskripsi_buku_nikah,
+							'deskripsi_foto_ktp' => $existingRecord->deskripsi_foto_ktp,
+							'deskripsi_foto_bukti_lahir' => $existingRecord->deskripsi_foto_bukti_lahir,
 							'formulir' => $existingRecord->formulir,
 							'bukti_nikah_foto' => $existingRecord->bukti_nikah_foto,
 							'bukti_lahir_foto' => $existingRecord->bukti_lahir_foto,
@@ -471,7 +528,7 @@ class upload_permohonan_akte_kelahiran extends CI_Controller
 						$hasil = [
 							'status' => true,
 							'message' => 'Permohonan Akte berhasil diupdate',
-							'data' => $display_data  // Include the updated data in the response
+							'data' => $display_data
 						];
 					}
 				}

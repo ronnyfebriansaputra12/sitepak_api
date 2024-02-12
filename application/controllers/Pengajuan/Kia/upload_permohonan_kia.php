@@ -59,6 +59,8 @@ class upload_permohonan_kia extends CI_Controller
 	{
 		$data_post = $_POST;
 		$hasil = [];
+		
+		// print_r($data_post);die;
 
 		$headers = apache_request_headers();
 
@@ -91,6 +93,8 @@ class upload_permohonan_kia extends CI_Controller
 			$data_post["KEC"] == "" ||
 			$data_post["KEL"] == "" ||
 			$data_post["ALASAN"] == "" ||
+			$data_post["DESKRIPSI_PAS_FOTO"] == "" ||
+			$data_post["DESKRIPSI_BUKTI_RUSAK"] == "" ||
 			$data_post["PENGAMBILAN"] == "" ||
 			$data_post["DAFTARID"] == "" ||
 			$data_post["NO_AKTA_LAHIR"] == "" ||
@@ -142,6 +146,8 @@ class upload_permohonan_kia extends CI_Controller
 						$data_kia['NO_KEC'] = $data_post["KEC"];
 						$data_kia['NO_KEL'] = $data_post["KEL"];
 						$data_kia['ALASAN'] = $data_post["ALASAN"];
+						$data_kia['DESKRIPSI_PAS_FOTO'] = $data_post["DESKRIPSI_PAS_FOTO"];
+						$data_kia['DESKRIPSI_BUKTI_RUSAK'] = $data_post["DESKRIPSI_BUKTI_RUSAK"];
 						$data_kia['NO_AKTA_LAHIR'] = $data_post["NO_AKTA_LAHIR"];
 						$data_kia['SC_KIA'] = $photo_path_sc_kia;
 						$data_kia['PAS_FOTO'] = $photo_path_pas_foto;
@@ -211,7 +217,7 @@ class upload_permohonan_kia extends CI_Controller
 			return;
 		}
 
-		$jwt_secret = "sitepak2023";
+		$jwt_secret = $this->config->item('jwt_secret');
 
 		try {
 			$token_data = JWT::decode($jwt_token, new Key($jwt_secret, 'HS256'));
@@ -235,7 +241,8 @@ class upload_permohonan_kia extends CI_Controller
 					'nama_lgkp' => $pengajuanKia[0]->nama_lgkp,
 					'alasan' => $pengajuanKia[0]->alasan,
 					'status' => $pengajuanKia[0]->status,
-					'alasan' => $pengajuanKia[0]->alasan,
+					'deskripsi_pas_foto' => $pengajuanKia[0]->deskripsi_pas_foto,
+					'deskripsi_bukti_rusak' => $pengajuanKia[0]->deskripsi_bukti_rusak,
 					'no_kec' => $pengajuanKia[0]->no_kec,
 					'no_kel' => $pengajuanKia[0]->no_kel,
 					'pengambilan' => $pengajuanKia[0]->pengambilan,
@@ -299,6 +306,8 @@ class upload_permohonan_kia extends CI_Controller
 			$data_post["KEC"] == "" ||
 			$data_post["KEL"] == "" ||
 			$data_post["ALASAN"] == "" ||
+			$data_post["DESKRIPSI_PAS_FOTO"] == "" ||
+			$data_post["DESKRIPSI_BUKTI_RUSAK"] == "" ||
 			$data_post["PENGAMBILAN"] == "" ||
 			$data_post["DAFTARID"] == "" ||
 			$data_post["NO_AKTA_LAHIR"] == "" ||
@@ -331,6 +340,8 @@ class upload_permohonan_kia extends CI_Controller
 					$existingRecord->no_kec = $data_post["KEC"];
 					$existingRecord->no_kel = $data_post["KEL"];
 					$existingRecord->alasan = $data_post["ALASAN"];
+					$existingRecord->deskripsi_pas_foto = $data_post["DESKRIPSI_PAS_FOTO"];
+					$existingRecord->deskripsi_bukti_rusak = $data_post["DESKRIPSI_BUKTI_RUSAK"];
 					$existingRecord->pengambilan = $data_post["PENGAMBILAN"];
 					$existingRecord->no_akta_lahir = $data_post["NO_AKTA_LAHIR"];
 					$existingRecord->akun = $data_post["AKUN"];
@@ -373,7 +384,8 @@ class upload_permohonan_kia extends CI_Controller
 							'nama_lgkp' => $existingRecord->nama_lgkp,
 							'alasan' => $existingRecord->alasan,
 							'status' => $existingRecord->status,
-							'alasan' => $existingRecord->alasan,
+							'deskripsi_pas_foto' => $existingRecord->deskripsi_pas_foto,
+							'deskripsi_bukti_rusak' => $existingRecord->deskripsi_bukti_rusak,
 							'no_kec' => $existingRecord->no_kec,
 							'no_kel' => $existingRecord->no_kel,
 							'no_akta_lahir' => $existingRecord->no_akta_lahir,

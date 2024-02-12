@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-class Daftar_kk_model extends MY_Model {	
-	static $table_name='DAFTAR_KK';
+class Daftar_ikan_gaul extends MY_Model {	
+	static $table_name='IKAN_GAUL';
 	static $primary_key=array('daftarid');
 	static $before_create=array("sebelum_insert");	
 	//static $before_update=array("sebelum_update");	

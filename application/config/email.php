@@ -45,3 +45,4 @@
 //$config['email_enesis']		="admin@enesis.coo.id";
 //$config['email_enesis']		="wahidin@begamax.com";
 //$config['email_enesis']		="samsul@geraisoft.com";
+$config['jwt_secret'] = "sitepak2023";

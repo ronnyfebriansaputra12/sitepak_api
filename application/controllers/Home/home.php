@@ -7,13 +7,11 @@ class home extends CI_Controller
 {
 	function login()
 	{
-		$input_data = file_get_contents('php://input');
-		$data_post = json_decode($input_data, true);
+		$data_post = $_POST;
 		$hasil = [];
 
-
 		$captcha_word_session = $this->session->userdata('captcha_word');
-		if (empty($captcha_word_session) || $data_post['captcha'] !== $captcha_word_session) {
+		if (empty($captcha_word_session) || $data_post['CAPTCHA'] !== $captcha_word_session) {
 			$hasil = [
 				'status' => false,
 				'message' => 'Captcha tidak valid',
@@ -25,7 +23,7 @@ class home extends CI_Controller
 
 		$user = User_sitepak_model::get_criteria(array(
 			"select" => "nik, nama, no_kk, kec, kel, no_hp, email, status",
-			"where" => array("nik" => $data_post["nik"], "PASSWORD" => md5($data_post["password"]))
+			"where" => array("nik" => $data_post["NIK"], "PASSWORD" => md5($data_post["PASSWORD"]))
 		));
 		$numRecords = count($user);
 
@@ -44,7 +42,7 @@ class home extends CI_Controller
 				];
 			} else {
 				// Generate JWT Token
-				$jwt_secret = "sitepak2023";
+				$jwt_secret = $this->config->item('jwt_secret');
 				$token_data = [
 					'nik' => $user[0]->nik,
 					'nama' => $user[0]->nama,
