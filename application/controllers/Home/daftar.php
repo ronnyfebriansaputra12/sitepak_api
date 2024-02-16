@@ -28,6 +28,7 @@ class daftar extends CI_Controller
 			$json_response = [
 				'word' => $captcha['word'],
 				'image' => $captcha['image'],
+				'url' =>$captcha['url'],
 			];
 
 			$this->output
