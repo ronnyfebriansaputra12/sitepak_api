@@ -97,24 +97,34 @@ class home extends CI_Controller
 		$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
 	}
 
+
 	function loginFe()
 	{
 		$data_post = $_POST;
 		$hasil = [];
 
-		// Hapus verifikasi CAPTCHA
-		// $captcha_word_session = $this->session->userdata('captcha_word');
-		// if (empty($captcha_word_session) || $data_post['CAPTCHA'] !== $captcha_word_session) {
-		//     $hasil = [
-		//         'status' => false,
-		//         'message' => 'Captcha tidak valid',
-		//         'data' => null
-		//     ];
-		//     $this->output->set_content_type('application/json')->set_output(json_encode($hasil));
-		//     return;
+
+		if (empty($data_post['CAPTCHA'])) {
+			$hasil = [
+				'status' => false,
+				'message' => 'Captcha tidak ditemukan',
+				'data' => null
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+			return;
+		}
+
+		// $captcha_word_session = isset($_SESSION['captcha_word']) ? $_SESSION['captcha_word'] : null;
+		// // print_r($captcha_word_session);die;
+		// if (empty($captcha_word_session) || strtolower($data_post['CAPTCHA']) !== strtolower($captcha_word_session)) {
+		// 	$hasil = [
+		// 		'status' => false,
+		// 		'message' => 'Captcha tidak valid',
+		// 		'data' => null
+		// 	];
+		// 	$this->output->set_content_type('application/json')->set_output(json_encode($hasil));
+		// 	return;
 		// }
-
-
 		$user = User_sitepak_model::get_criteria(array(
 			"select" => "nik, nama, no_kk, kec, kel, no_hp, email, status",
 			"where" => array("nik" => $data_post["NIK"], "PASSWORD" => md5($data_post["PASSWORD"]))
@@ -157,14 +167,15 @@ class home extends CI_Controller
 					'status' => $user[0]->status,
 				];
 
+
 				// Remove existing captcha images
-				// $imagePath = './assets/captcha';
-				// if (file_exists($imagePath)) {
-				//     $files = glob($imagePath . '/*');
-				//     foreach ($files as $file) {
-				//         unlink($file);
-				//     }
-				// }
+				$imagePath = './assets/captcha';
+				if (file_exists($imagePath)) {
+					$files = glob($imagePath . '/*');
+					foreach ($files as $file) {
+						unlink($file);
+					}
+				}
 
 				$hasil = [
 					'status' => true,
